@@ -15,10 +15,10 @@ I'm also planning to add RDF support to the program in the future.
 
 Version: 3.0 (starting off at 3.0 :P)
 
-Copyright and License Information
-------
-**Copyright © 2009 Alex Munroe (Eevee)<br>
-Copyright © 2013 Aidan F (Duck-Jr)**
+### Copyright and License Information
+
+**Copyright © 2009 Alex Munroe (Eevee)**<br>
+**Copyright © 2013 Aidan F (Duck-Jr)**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
