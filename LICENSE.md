@@ -1,3 +1,6 @@
+MIT License
+===========
+
 Copyright © 2009 Alex Munroe (Eevee)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
