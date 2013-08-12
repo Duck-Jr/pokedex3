@@ -31,5 +31,5 @@ for version_group, pokemon_move_method in q:
 
 
 load.dump(session, tables=['version_group_pokemon_move_methods'])
-print "Dumped to CSV, rolling back transaction"
+print("Dumped to CSV, rolling back transaction")
 session.rollback()

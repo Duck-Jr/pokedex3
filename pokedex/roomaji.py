@@ -15,14 +15,14 @@ class Romanizer(object):
         self.parent = parent
         if parent:
             self.tables = parent.tables
-            for name, table in tables.items():
+            for name, table in list(tables.items()):
                 # Take a copy -- don't want to clobber the parent's tables
                 self.tables[name] = dict(self.tables[name])
                 self.tables[name].update(table)
         else:
             self.tables = tables
 
-        for name, table in self.tables.items():
+        for name, table in list(self.tables.items()):
             setattr(self, name, table)
 
     def romanize(self, string):
@@ -76,14 +76,14 @@ class Romanizer(object):
                 last_kana = new_char
 
             # Sokuon
-            elif char in (u'っ', u'ッ'):
+            elif char in ('っ', 'ッ'):
                 # Remember it and double the consonant next time around
                 last_kana = 'sokuon'
 
             # Extended vowel or n
-            elif char == u'ー':
+            elif char == 'ー':
                 if last_kana[-1] not in vowels:
-                    raise ValueError(u"'ー' must follow by a vowel.")
+                    raise ValueError("'ー' must follow by a vowel.")
                 if last_kana[-1] in self.lengthened_vowels:
                     characters[-1] = characters[-1][:-1]
                     characters.append(self.lengthened_vowels[last_kana[-1]])
@@ -128,7 +128,7 @@ class Romanizer(object):
         if last_kana == 'sokuon':
             raise ValueError("Sokuon cannot be the last character.")
 
-        return unicode(''.join(characters))
+        return str(''.join(characters))
 
 
 romanizers = dict()
@@ -136,49 +136,49 @@ romanizers = dict()
 romanizers['en'] = Romanizer(
     roomaji_kana={
         # Hiragana
-        u'あ': 'a',     u'い': 'i',     u'う': 'u',     u'え': 'e',     u'お': 'o',
-        u'か': 'ka',    u'き': 'ki',    u'く': 'ku',    u'け': 'ke',    u'こ': 'ko',
-        u'さ': 'sa',    u'し': 'shi',   u'す': 'su',    u'せ': 'se',    u'そ': 'so',
-        u'た': 'ta',    u'ち': 'chi',   u'つ': 'tsu',   u'て': 'te',    u'と': 'to',
-        u'な': 'na',    u'に': 'ni',    u'ぬ': 'nu',    u'ね': 'ne',    u'の': 'no',
-        u'は': 'ha',    u'ひ': 'hi',    u'ふ': 'fu',    u'へ': 'he',    u'ほ': 'ho',
-        u'ま': 'ma',    u'み': 'mi',    u'む': 'mu',    u'め': 'me',    u'も': 'mo',
-        u'や': 'ya',                    u'ゆ': 'yu',                    u'よ': 'yo',
-        u'ら': 'ra',    u'り': 'ri',    u'る': 'ru',    u'れ': 're',    u'ろ': 'ro',
-        u'わ': 'wa',    u'ゐ': 'wi',                    u'ゑ': 'we',    u'を': 'wo',
-                                                                        u'ん': 'n',
-        u'が': 'ga',    u'ぎ': 'gi',    u'ぐ': 'gu',    u'げ': 'ge',    u'ご': 'go',
-        u'ざ': 'za',    u'じ': 'ji',    u'ず': 'zu',    u'ぜ': 'ze',    u'ぞ': 'zo',
-        u'だ': 'da',    u'ぢ': 'ji',    u'づ': 'dzu',   u'で': 'de',    u'ど': 'do',
-        u'ば': 'ba',    u'び': 'bi',    u'ぶ': 'bu',    u'べ': 'be',    u'ぼ': 'bo',
-        u'ぱ': 'pa',    u'ぴ': 'pi',    u'ぷ': 'pu',    u'ぺ': 'pe',    u'ぽ': 'po',
+        'あ': 'a',     'い': 'i',     'う': 'u',     'え': 'e',     'お': 'o',
+        'か': 'ka',    'き': 'ki',    'く': 'ku',    'け': 'ke',    'こ': 'ko',
+        'さ': 'sa',    'し': 'shi',   'す': 'su',    'せ': 'se',    'そ': 'so',
+        'た': 'ta',    'ち': 'chi',   'つ': 'tsu',   'て': 'te',    'と': 'to',
+        'な': 'na',    'に': 'ni',    'ぬ': 'nu',    'ね': 'ne',    'の': 'no',
+        'は': 'ha',    'ひ': 'hi',    'ふ': 'fu',    'へ': 'he',    'ほ': 'ho',
+        'ま': 'ma',    'み': 'mi',    'む': 'mu',    'め': 'me',    'も': 'mo',
+        'や': 'ya',                    'ゆ': 'yu',                    'よ': 'yo',
+        'ら': 'ra',    'り': 'ri',    'る': 'ru',    'れ': 're',    'ろ': 'ro',
+        'わ': 'wa',    'ゐ': 'wi',                    'ゑ': 'we',    'を': 'wo',
+                                                                        'ん': 'n',
+        'が': 'ga',    'ぎ': 'gi',    'ぐ': 'gu',    'げ': 'ge',    'ご': 'go',
+        'ざ': 'za',    'じ': 'ji',    'ず': 'zu',    'ぜ': 'ze',    'ぞ': 'zo',
+        'だ': 'da',    'ぢ': 'ji',    'づ': 'dzu',   'で': 'de',    'ど': 'do',
+        'ば': 'ba',    'び': 'bi',    'ぶ': 'bu',    'べ': 'be',    'ぼ': 'bo',
+        'ぱ': 'pa',    'ぴ': 'pi',    'ぷ': 'pu',    'ぺ': 'pe',    'ぽ': 'po',
 
         # Katakana
-        u'ア': 'a',     u'イ': 'i',     u'ウ': 'u',     u'エ': 'e',     u'オ': 'o',
-        u'カ': 'ka',    u'キ': 'ki',    u'ク': 'ku',    u'ケ': 'ke',    u'コ': 'ko',
-        u'サ': 'sa',    u'シ': 'shi',   u'ス': 'su',    u'セ': 'se',    u'ソ': 'so',
-        u'タ': 'ta',    u'チ': 'chi',   u'ツ': 'tsu',   u'テ': 'te',    u'ト': 'to',
-        u'ナ': 'na',    u'ニ': 'ni',    u'ヌ': 'nu',    u'ネ': 'ne',    u'ノ': 'no',
-        u'ハ': 'ha',    u'ヒ': 'hi',    u'フ': 'fu',    u'ヘ': 'he',    u'ホ': 'ho',
-        u'マ': 'ma',    u'ミ': 'mi',    u'ム': 'mu',    u'メ': 'me',    u'モ': 'mo',
-        u'ヤ': 'ya',                    u'ユ': 'yu',                    u'ヨ': 'yo',
-        u'ラ': 'ra',    u'リ': 'ri',    u'ル': 'ru',    u'レ': 're',    u'ロ': 'ro',
-        u'ワ': 'wa',    u'ヰ': 'wi',                    u'ヱ': 'we',    u'ヲ': 'wo',
-                                                                        u'ン': 'n',
-        u'ガ': 'ga',    u'ギ': 'gi',    u'グ': 'gu',    u'ゲ': 'ge',    u'ゴ': 'go',
-        u'ザ': 'za',    u'ジ': 'ji',    u'ズ': 'zu',    u'ゼ': 'ze',    u'ゾ': 'zo',
-        u'ダ': 'da',    u'ヂ': 'ji',    u'ヅ': 'dzu',   u'デ': 'de',    u'ド': 'do',
-        u'バ': 'ba',    u'ビ': 'bi',    u'ブ': 'bu',    u'ベ': 'be',    u'ボ': 'bo',
-        u'パ': 'pa',    u'ピ': 'pi',    u'プ': 'pu',    u'ペ': 'pe',    u'ポ': 'po',
-                                        u'ヴ': 'vu',
+        'ア': 'a',     'イ': 'i',     'ウ': 'u',     'エ': 'e',     'オ': 'o',
+        'カ': 'ka',    'キ': 'ki',    'ク': 'ku',    'ケ': 'ke',    'コ': 'ko',
+        'サ': 'sa',    'シ': 'shi',   'ス': 'su',    'セ': 'se',    'ソ': 'so',
+        'タ': 'ta',    'チ': 'chi',   'ツ': 'tsu',   'テ': 'te',    'ト': 'to',
+        'ナ': 'na',    'ニ': 'ni',    'ヌ': 'nu',    'ネ': 'ne',    'ノ': 'no',
+        'ハ': 'ha',    'ヒ': 'hi',    'フ': 'fu',    'ヘ': 'he',    'ホ': 'ho',
+        'マ': 'ma',    'ミ': 'mi',    'ム': 'mu',    'メ': 'me',    'モ': 'mo',
+        'ヤ': 'ya',                    'ユ': 'yu',                    'ヨ': 'yo',
+        'ラ': 'ra',    'リ': 'ri',    'ル': 'ru',    'レ': 're',    'ロ': 'ro',
+        'ワ': 'wa',    'ヰ': 'wi',                    'ヱ': 'we',    'ヲ': 'wo',
+                                                                        'ン': 'n',
+        'ガ': 'ga',    'ギ': 'gi',    'グ': 'gu',    'ゲ': 'ge',    'ゴ': 'go',
+        'ザ': 'za',    'ジ': 'ji',    'ズ': 'zu',    'ゼ': 'ze',    'ゾ': 'zo',
+        'ダ': 'da',    'ヂ': 'ji',    'ヅ': 'dzu',   'デ': 'de',    'ド': 'do',
+        'バ': 'ba',    'ビ': 'bi',    'ブ': 'bu',    'ベ': 'be',    'ボ': 'bo',
+        'パ': 'pa',    'ピ': 'pi',    'プ': 'pu',    'ペ': 'pe',    'ポ': 'po',
+                                        'ヴ': 'vu',
     },
 
     roomaji_youon={
         # Hiragana
-        u'ゃ': 'ya',                    u'ゅ': 'yu',                    u'ょ': 'yo',
+        'ゃ': 'ya',                    'ゅ': 'yu',                    'ょ': 'yo',
 
         # Katakana
-        u'ャ': 'ya',                    u'ュ': 'yu',                    u'ョ': 'yo',
+        'ャ': 'ya',                    'ュ': 'yu',                    'ョ': 'yo',
     },
 
     # XXX If romanize() ever handles hiragana, it will need to make sure that the
@@ -186,27 +186,27 @@ romanizers['en'] = Romanizer(
     # This does not include every small kana combination, but should include every
     # one used in a Pokémon name.  An exhaustive list would be..  very long
     roomaji_small_kana={
-        u'ァ': 'a',     u'ィ': 'i',     u'ゥ': 'u',     u'ェ': 'e',     u'ォ': 'o',
+        'ァ': 'a',     'ィ': 'i',     'ゥ': 'u',     'ェ': 'e',     'ォ': 'o',
     },
     roomaji_small_kana_combos={
         # These are, by the way, fairly arbitrary.  "shi xi" to mean "sy" is
         # particularly weird, but it seems to be what GF intends
 
         # Simple vowel replacement
-                        u'ウィ': 'wi',  u'ウゥ': 'wu',  u'ウェ': 'we',  u'ウォ': 'wo',
-        u'ヴァ': 'va',  u'ヴィ': 'vi',                  u'ヴェ': 've',  u'ヴォ': 'vo',
-                                                        u'チェ': 'che',
-                                                        u'シェ': 'she',
-                                                        u'ジェ': 'je',
-        u'テァ': 'tha', u'ティ': 'ti',  u'テゥ': 'thu', u'テェ': 'tye', u'テォ': 'tho',
-        u'デァ': 'dha', u'ディ': 'di',  u'デゥ': 'dhu', u'デェ': 'dye', u'デォ': 'dho',
-        u'ファ': 'fa',  u'フィ': 'fi',  u'ホゥ': 'hu',  u'フェ': 'fe',  u'フォ': 'fo',
+                        'ウィ': 'wi',  'ウゥ': 'wu',  'ウェ': 'we',  'ウォ': 'wo',
+        'ヴァ': 'va',  'ヴィ': 'vi',                  'ヴェ': 've',  'ヴォ': 'vo',
+                                                        'チェ': 'che',
+                                                        'シェ': 'she',
+                                                        'ジェ': 'je',
+        'テァ': 'tha', 'ティ': 'ti',  'テゥ': 'thu', 'テェ': 'tye', 'テォ': 'tho',
+        'デァ': 'dha', 'ディ': 'di',  'デゥ': 'dhu', 'デェ': 'dye', 'デォ': 'dho',
+        'ファ': 'fa',  'フィ': 'fi',  'ホゥ': 'hu',  'フェ': 'fe',  'フォ': 'fo',
 
         # Not so much
-        u'シィ': 'sy',
-        u'ミィ': 'my',
-        u'ビィ': 'by',
-        u'ピィ': 'py',
+        'シィ': 'sy',
+        'ミィ': 'my',
+        'ビィ': 'by',
+        'ピィ': 'py',
     },
     lengthened_vowels={},
     y_drop={'chi': 'ch', 'shi': 'sh', 'ji': 'j'},
@@ -214,24 +214,24 @@ romanizers['en'] = Romanizer(
 
 romanizers['cs'] = Romanizer(parent=romanizers['en'],
     roomaji_kana={
-        u'し': u'ši', u'ち': u'či', u'つ': u'cu',
-        u'や': u'ja', u'ゆ': u'ju', u'よ': u'jo',
-        u'じ': u'dži', u'ぢ': u'dži',
-        u'シ': u'ši', u'チ': u'či', u'ツ': u'cu',
-        u'ヤ': u'ja', u'ユ': u'ju', u'ヨ': 'jo',
-        u'ジ': u'dži', u'ヂ': u'dži',
+        'し': 'ši', 'ち': 'či', 'つ': 'cu',
+        'や': 'ja', 'ゆ': 'ju', 'よ': 'jo',
+        'じ': 'dži', 'ぢ': 'dži',
+        'シ': 'ši', 'チ': 'či', 'ツ': 'cu',
+        'ヤ': 'ja', 'ユ': 'ju', 'ヨ': 'jo',
+        'ジ': 'dži', 'ヂ': 'dži',
     },
     roomaji_youon={
-        u'ゃ': 'ja', u'ゅ': 'ju', u'ょ': 'jo',
-        u'ャ': 'ja', u'ュ': 'ju', u'ョ': 'jo',
+        'ゃ': 'ja', 'ゅ': 'ju', 'ょ': 'jo',
+        'ャ': 'ja', 'ュ': 'ju', 'ョ': 'jo',
     },
     roomaji_small_kana_combos={
-        u'チェ': u'če', u'シェ': u'še', u'ジェ': u'dže',
-        u'テェ': u'tje', u'デェ': u'dje',
-        u'シィ': u'sí', u'ミィ': u'mí', u'ビィ': u'bí', u'ピィ': u'pí',
+        'チェ': 'če', 'シェ': 'še', 'ジェ': 'dže',
+        'テェ': 'tje', 'デェ': 'dje',
+        'シィ': 'sí', 'ミィ': 'mí', 'ビィ': 'bí', 'ピィ': 'pí',
     },
-    lengthened_vowels={'a': u'á', 'e': u'é', 'i': u'í', 'o': u'ó', 'u': u'ú'},
-    y_drop={u'či': u'č', u'ši': u'š', u'dži': u'dž', u'ni': u'ňj'},
+    lengthened_vowels={'a': 'á', 'e': 'é', 'i': 'í', 'o': 'ó', 'u': 'ú'},
+    y_drop={'či': 'č', 'ši': 'š', 'dži': 'dž', 'ni': 'ňj'},
 )
 
 def romanize(string, lang='en'):

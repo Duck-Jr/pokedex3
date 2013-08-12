@@ -29,7 +29,7 @@ def compute_dependencies(tables):
     return graph
 
 #: The dependency graph for pokedex.db.tables
-_pokedex_graph = compute_dependencies(metadata.tables.values())
+_pokedex_graph = compute_dependencies(list(metadata.tables.values()))
 
 def find_dependent_tables(tables, graph=None):
     """Recursively find all tables which depend on the given tables.

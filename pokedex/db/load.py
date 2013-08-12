@@ -26,9 +26,9 @@ def _get_table_names(metadata, patterns):
                 table_name, _ = os.path.splitext(filename)
                 pattern = table_name
 
-            table_names.update(fnmatch.filter(metadata.tables.keys(), pattern))
+            table_names.update(fnmatch.filter(list(metadata.tables.keys()), pattern))
     else:
-        table_names = metadata.tables.keys()
+        table_names = list(metadata.tables.keys())
 
     return list(table_names)
 
@@ -57,7 +57,7 @@ def _get_verbose_prints(verbose):
         # Also, space-pad to keep the cursor in a known column
         num_spaces = 66 - len(truncated_thing)
 
-        print "%s...%s" % (truncated_thing, ' ' * num_spaces),
+        print("%s...%s" % (truncated_thing, ' ' * num_spaces), end=' ')
         sys.stdout.flush()
 
     if sys.stdout.isatty():
@@ -90,7 +90,7 @@ def _get_verbose_prints(verbose):
             pass
 
         def print_done(msg='ok'):
-            print msg
+            print(msg)
 
     return print_start, print_status, print_done
 
@@ -193,7 +193,7 @@ def load(session, tables=[], directory=None, drop_tables=False, verbose=False, s
         csvsize = os.stat(csvpath).st_size
 
         reader = csv.reader(csvfile, lineterminator='\n')
-        column_names = [unicode(column) for column in reader.next()]
+        column_names = [str(column) for column in next(reader)]
 
         if not safe and session.connection().dialect.name == 'postgresql':
             """
@@ -410,7 +410,7 @@ def dump(session, tables=[], directory=None, verbose=False, langs=['en']):
                     elif val == False:
                         val = '0'
                     else:
-                        val = unicode(val).encode('utf-8')
+                        val = str(val).encode('utf-8')
 
                     csvs.append(val)
 

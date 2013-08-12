@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-u"""General handling of translations
+"""General handling of translations
 
 The general idea is to get messages from somewhere: the source pokedex CSVs,
 or the translation CSVs, etc., then merge them together in some way, and shove
@@ -150,15 +150,15 @@ class Message(object):
     def __unicode__(self):
         string = '"%s"' % self.string
         if len(string) > 20:
-            string = string[:15] + u'"...'
-        template = u'<Message from {self.origin} for {self.cls}.{self.colname}:{self.id} -- {string}>'
+            string = string[:15] + '"...'
+        template = '<Message from {self.origin} for {self.cls}.{self.colname}:{self.id} -- {string}>'
         return template.format(self=self, string=string)
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
+        return str(self).encode('utf-8')
 
     def __repr__(self):
-        return unicode(self).encode('utf-8')
+        return str(self).encode('utf-8')
 
 class Translations(object):
     """Data and opertaions specific to a location on disk (and a source language)
@@ -206,7 +206,7 @@ class Translations(object):
             self._sources = {}
             for message in self.yield_source_messages():
                 self._sources.setdefault(message.language_id, []).append(message)
-            self._sources = dict((k, tuple(merge_adjacent(v))) for k, v in self._sources.items())
+            self._sources = dict((k, tuple(merge_adjacent(v))) for k, v in list(self._sources.items()))
             return self.official_messages(lang)
         except KeyError:
             # Looks like there are no messages in the DB for this language
@@ -243,8 +243,8 @@ class Translations(object):
                             sourcehash,
                             string.encode('utf-8'),
                         ))
-        for utf8len, source, string in warnings.values():
-            template = u'Error: {size}B value for {colsize}B column! {key[0]}.{key[2]}:{key[1]}: {string}'
+        for utf8len, source, string in list(warnings.values()):
+            template = 'Error: {size}B value for {colsize}B column! {key[0]}.{key[2]}:{key[1]}: {string}'
             warning = template.format(
                     key=source.merge_key,
                     string=string,
@@ -252,8 +252,8 @@ class Translations(object):
                     colsize=source.colsize,
                 )
             if len(warning) > 79:
-                warning = warning[:76] + u'...'
-            print warning.encode('utf-8')
+                warning = warning[:76] + '...'
+            print(warning.encode('utf-8'))
 
     def reader_for_class(self, cls, reader_class=csv.reader):
         tablename = cls.__table__.name
@@ -287,7 +287,7 @@ class Translations(object):
                 except KeyError:
                     pass
                 else:
-                    for colname, summary_class in colmap.items():
+                    for colname, summary_class in list(colmap.items()):
                         column = translation_class.__table__.c[colname]
                         streams.append(yield_source_csv_messages(
                                 summary_class,
@@ -310,7 +310,7 @@ class Translations(object):
 
     def yield_all_translations(self):
         stream = Merge()
-        for lang in self.language_identifiers.values():
+        for lang in list(self.language_identifiers.values()):
             stream.add_iterator(self.yield_target_messages(lang))
         return (message for message in stream if not message.official)
 
@@ -320,9 +320,9 @@ class Translations(object):
         langs is either a list of language identifiers or None
         """
         if langs is None:
-            langs = self.language_identifiers.values()
+            langs = list(self.language_identifiers.values())
         stream = Merge()
-        for lang in self.language_identifiers.values():
+        for lang in list(self.language_identifiers.values()):
             stream.add_iterator(self.yield_target_messages(lang))
         stream = (message for message in stream if not message.official)
         count = 0
@@ -353,12 +353,12 @@ class Translations(object):
                 everything[translation_class][key][colname] = message.string
                 count += 1
             if count > 1000:
-                for translation_class, key_data in everything.items():
-                    yield translation_class, key_data.values()
+                for translation_class, key_data in list(everything.items()):
+                    yield translation_class, list(key_data.values())
                 count = 0
                 everything.clear()
-        for translation_class, data_dict in everything.items():
-            yield translation_class, data_dict.values()
+        for translation_class, data_dict in list(everything.items()):
+            yield translation_class, list(data_dict.values())
 
 def group_by_object(stream):
     """Group stream by object
@@ -366,7 +366,7 @@ def group_by_object(stream):
     Yields ((class name, object ID), (list of messages)) pairs.
     """
     stream = iter(stream)
-    current = stream.next()
+    current = next(stream)
     current_key = current.cls, current.id
     group = [current]
     for message in stream:
@@ -395,7 +395,7 @@ class Merge(object):
     def add_iterator(self, iterator):
         iterator = iter(iterator)
         try:
-            value = iterator.next()
+            value = next(iterator)
         except StopIteration:
             return
         else:
@@ -404,7 +404,7 @@ class Merge(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         if self.next_values:
             value, iterator = heapq.heappop(self.next_values)
             self.add_iterator(iterator)
@@ -415,7 +415,7 @@ class Merge(object):
 def merge_adjacent(gen):
     """Merge adjacent messages that compare equal"""
     gen = iter(gen)
-    last = gen.next()
+    last = next(gen)
     for this in gen:
         if this.merge_key == last.merge_key:
             last.merge(this)
@@ -441,16 +441,16 @@ def leftjoin(left_stream, right_stream, key=lambda x: x, unused=None):
     left_stream = iter(left_stream)
     right_stream = iter(right_stream)
     try:
-        right = right_stream.next()
+        right = next(right_stream)
         for left in left_stream:
             while right and key(left) > key(right):
                 if unused is not None:
                     unused(right)
-                right = right_stream.next()
+                right = next(right_stream)
             if key(left) == key(right):
                 yield left, right
                 del left
-                right = right_stream.next()
+                right = next(right_stream)
             else:
                 yield left, None
     except StopIteration:
@@ -478,7 +478,7 @@ def yield_source_csv_messages(cls, foreign_cls, csvreader, force_column=None):
     """Yield all messages from one source CSV file.
     """
     columns = list(cls.__table__.c)
-    column_names = csvreader.next()
+    column_names = next(csvreader)
     # Assumptions: rows are in lexicographic order
     #  (taking numeric values as numbers of course)
     # Assumptions about the order of columns:
@@ -524,7 +524,7 @@ def yield_guessed_csv_messages(file):
     """Yield messages from a CSV file, using the header to figure out what the data means.
     """
     csvreader = csv.reader(file, lineterminator='\n')
-    column_names = csvreader.next()
+    column_names = next(csvreader)
     if column_names == 'language_id,table,id,column,source_crc,string'.split(','):
         # A translation CSV
         return yield_translation_csv_messages(file, True)
@@ -553,7 +553,7 @@ def yield_translation_csv_messages(file, no_header=False):
     """
     csvreader = csv.reader(file, lineterminator='\n')
     if not no_header:
-        columns = csvreader.next()
+        columns = next(csvreader)
         assert columns == 'language_id,table,id,column,source_crc,string'.split(',')
     for language_id, table, id, column, source_crc, string in csvreader:
         yield Message(
@@ -591,7 +591,7 @@ def pot_for_column(cls, column, summary=False):
 
 def number_replace(source, string):
     numbers_iter = iter(number_re.findall(source))
-    next_number = lambda match: numbers_iter.next()
+    next_number = lambda match: next(numbers_iter)
     return re.sub(r'\{num\}', next_number, string)
 
 def match_to_source(source, *translations):
@@ -617,7 +617,7 @@ def match_to_source(source, *translations):
             current_source = number_replace(source.string, translation.source)
             current_crc = crc(current_source)
         elif '{num}' in translation.string:
-            print (u'Warning: {num} appears in %s, but not marked for number replacement. Discarding!' % translation).encode('utf-8')
+            print(('Warning: {num} appears in %s, but not marked for number replacement. Discarding!' % translation).encode('utf-8'))
             continue
         else:
             current_string = translation.string
@@ -655,5 +655,5 @@ def merge_translations(source_stream, *translation_streams, **kwargs):
             synchronize(source, t, key=lambda m: m.merge_key, unused=kwargs.get('unused'))
             for t in translation_streams
         ]
-    for messages in itertools.izip(source, *streams):
+    for messages in zip(source, *streams):
         yield match_to_source(*messages)

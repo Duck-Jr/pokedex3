@@ -1,6 +1,6 @@
 # Encoding: UTF-8
 
-u"""Automatic documentation generation for pokédex tables
+"""Automatic documentation generation for pokédex tables
 
 This adds a "dex-table" directive to Sphinx, which works like "autoclass",
 but documents Pokédex mapped classes.
@@ -26,6 +26,7 @@ from sqlalchemy.ext.associationproxy import AssociationProxy
 from pokedex.db.markdown import MoveEffectPropertyMap, MoveEffectProperty
 
 from pokedex.db import tables, markdown
+import collections
 
 # Make sure all the backrefs are in place
 configure_mappers()
@@ -55,7 +56,7 @@ def column_type_str(column):
     if type(type_) == types.Boolean:
         return 'bool'
     if type(type_) == types.Unicode:
-        return u'unicode – %s' % column.info['format']
+        return 'unicode – %s' % column.info['format']
     if type(type_) == types.Enum:
         return 'enum: [%s]' % ', '.join(type_.enums)
     if type(type_) == markdown.MarkdownColumn:
@@ -73,28 +74,28 @@ def column_header(c, class_name=None, transl_name=None, show_type=True,
     else:
         name = c.name
     if class_name:
-        result.append(u'%s.\ **%s**' % (class_name, name))
+        result.append('%s.\ **%s**' % (class_name, name))
     else:
-        result.append(u'**%s**' % c.name)
+        result.append('**%s**' % c.name)
     if c.foreign_keys:
         for fk in c.foreign_keys:
             if fk.column in column_to_cls:
                 foreign_cls = column_to_cls[fk.column]
                 if relation_name and relation_name + '_id' == c.name:
-                    result.append(u'(%s →' % c.name)
+                    result.append('(%s →' % c.name)
                 elif relation_name:
-                    result.append(u'(**%s** →' % c.name)
+                    result.append('(**%s** →' % c.name)
                 else:
-                    result.append(u'(→')
-                result.append(u':class:`~pokedex.db.tables.%s`.%s)' % (
+                    result.append('(→')
+                result.append(':class:`~pokedex.db.tables.%s`.%s)' % (
                         foreign_cls.__name__,
                         fk.column.name
                     ))
                 break
     elif show_type:
-        result.append(u'(*%s*)' % column_type_str(c))
+        result.append('(*%s*)' % column_type_str(c))
     if transl_name:
-        result.append(u'via *%s*' % transl_name)
+        result.append('via *%s*' % transl_name)
     return ' '.join(result)
 
 
@@ -110,14 +111,14 @@ def with_header(header=None):
             result = list(func(cls, remaining_attrs))
             if result:
                 # Sphinx/ReST doesn't allow "-----" just anywhere :(
-                yield u''
-                yield u'.. raw:: html'
-                yield u''
-                yield u'    <hr>'
-                yield u''
+                yield ''
+                yield '.. raw:: html'
+                yield ''
+                yield '    <hr>'
+                yield ''
                 if header:
-                    yield header + u':'
-                    yield u''
+                    yield header + ':'
+                    yield ''
                 for row in result:
                     yield row
         return wrapped
@@ -126,22 +127,22 @@ def with_header(header=None):
 ### Section generation functions
 
 def generate_table_header(cls, remaining_attrs):
-    first_line, sep, next_lines = unicode(cls.__doc__).partition(u'\n')
+    first_line, sep, next_lines = str(cls.__doc__).partition('\n')
     yield first_line
     for line in textwrap.dedent(next_lines).split('\n'):
         yield line
     yield ''
 
-    yield u'Table name: *%s*' % cls.__tablename__
+    yield 'Table name: *%s*' % cls.__tablename__
     try:
-        yield u'(single: *%s*)' % cls.__singlename__
+        yield '(single: *%s*)' % cls.__singlename__
     except AttributeError:
         pass
-    yield u''
+    yield ''
 
-    yield u'Primary key: %s.' % u', '.join(
-        u'**%s**' % col.key for col in cls.__table__.primary_key.columns)
-    yield u''
+    yield 'Primary key: %s.' % ', '.join(
+        '**%s**' % col.key for col in cls.__table__.primary_key.columns)
+    yield ''
 
 def generate_common(cls, remaining_attrs):
     common_col_headers = []
@@ -160,14 +161,14 @@ def generate_common(cls, remaining_attrs):
         if len(common_col_headers) > 1:
             common_col_headers[-1] = 'and ' + common_col_headers[-1]
         if len(common_col_headers) > 2:
-            separator = u', '
+            separator = ', '
         else:
-            separator = u' '
-        yield u'Has'
+            separator = ' '
+        yield 'Has'
         yield separator.join(common_col_headers) + '.'
-        yield u''
+        yield ''
 
-@with_header(u'Columns')
+@with_header('Columns')
 def generate_columns(cls, remaining_attrs):
     name = cls.__name__
     for c in [c for c in cls.__table__.c if c.name not in common_columns]:
@@ -180,11 +181,11 @@ def generate_columns(cls, remaining_attrs):
             remaining_attrs.remove(relation_name)
         else:
             yield column_header(c, name) + ':'
-        yield u''
-        yield u'  ' + unicode(c.info['description'])
-        yield u''
+        yield ''
+        yield '  ' + str(c.info['description'])
+        yield ''
 
-@with_header(u'Internationalized strings')
+@with_header('Internationalized strings')
 def generate_strings(cls, remaining_attrs):
     for translation_class in cls.translation_classes:
         for c in translation_class.__table__.c:
@@ -195,11 +196,11 @@ def generate_strings(cls, remaining_attrs):
                     continue
                 yield column_header(c, cls.__name__,
                         translation_class.__table__.name)
-                yield u''
-                yield u'  ' + unicode(c.info['description'])
-                yield u''
+                yield ''
+                yield '  ' + str(c.info['description'])
+                yield ''
 
-@with_header(u'Relationships')
+@with_header('Relationships')
 def generate_relationships(cls, remaining_attrs):
     def isrelationship(prop):
         return isinstance(prop, InstrumentedAttribute) and isinstance(prop.property, RelationshipProperty)
@@ -209,16 +210,16 @@ def generate_relationships(cls, remaining_attrs):
         if not isrelationship(prop):
             continue
         rel = prop.property
-        yield u'%s.\ **%s**' % (cls.__name__, attr_name)
-        class_name = u':class:`~pokedex.db.tables.%s`' % rel.mapper.class_.__name__
+        yield '%s.\ **%s**' % (cls.__name__, attr_name)
+        class_name = ':class:`~pokedex.db.tables.%s`' % rel.mapper.class_.__name__
         if rel.uselist:
-            class_name = u'[%s]' % class_name
-        yield u'(→ %s)' % class_name
+            class_name = '[%s]' % class_name
+        yield '(→ %s)' % class_name
         if rel.doc:
-            yield u''
-            yield u'  ' + unicode(rel.doc)
+            yield ''
+            yield '  ' + str(rel.doc)
         if rel.secondary is not None:
-            yield u''
+            yield ''
             yield '  Association table: ``%s``' % rel.secondary
         #if rel.primaryjoin is not None:
         #    yield u''
@@ -226,47 +227,47 @@ def generate_relationships(cls, remaining_attrs):
         #    if rel.secondaryjoin is not None:
         #        yield '  , ``%s``' % rel.secondaryjoin
         if rel.order_by:
-            yield u''
-            yield u'  '
-            yield '  Ordered by: ' + u', '.join(
-                    u'``%s``' % o for o in rel.order_by)
-        yield u''
+            yield ''
+            yield '  '
+            yield '  Ordered by: ' + ', '.join(
+                    '``%s``' % o for o in rel.order_by)
+        yield ''
         remaining_attrs.remove(attr_name)
 
-@with_header(u'Association Proxies')
+@with_header('Association Proxies')
 def generate_associationproxies(cls, remaining_attrs):
     for attr_name in sorted(remaining_attrs):
         prop = getattr(cls, attr_name)
         if isinstance(prop, AssociationProxy):
-            yield u'%s.\ **%s**:' % (cls.__name__, attr_name)
+            yield '%s.\ **%s**:' % (cls.__name__, attr_name)
             yield '``{prop.remote_attr.key}`` of ``self.{prop.local_attr.key}``'.format(
                     prop=prop)
             '''if 'description' in info:
                 yield u''
                 yield u'  ' + unicode(info['description'])'''
-            yield u''
+            yield ''
             remaining_attrs.remove(attr_name)
 
 
-@with_header(u'Undocumented')
+@with_header('Undocumented')
 def generate_undocumented(cls, remaining_attrs):
     for c in sorted([c for c in remaining_attrs if isinstance(getattr(cls, c),
             (InstrumentedAttribute, AssociationProxy,
                 MoveEffectPropertyMap, MoveEffectProperty))]):
-        yield u''
-        yield u'%s.\ **%s**' % (cls.__name__, c)
+        yield ''
+        yield '%s.\ **%s**' % (cls.__name__, c)
         remaining_attrs.remove(c)
 
 @with_header(None)
 def generate_other(cls, remaining_attrs):
     for c in sorted(remaining_attrs):
-        yield u''
+        yield ''
         member = getattr(cls, c)
-        if callable(member):
+        if isinstance(member, collections.Callable):
             yield '.. automethod:: %s.%s' % (cls.__name__, c)
         else:
             yield '.. autoattribute:: %s.%s' % (cls.__name__, c)
-        yield u''
+        yield ''
     remaining_attrs.clear()
 
 
@@ -321,7 +322,7 @@ class DexTable(PyClasslike):
         generated_content.extend(generate_undocumented(cls, remaining_attrs))
         generated_content.extend(generate_other(cls, remaining_attrs))
 
-        generated_content.append(u'')
+        generated_content.append('')
         self.content = ViewList(generated_content + list(self.content))
         return super(DexTable, self).before_content()
 

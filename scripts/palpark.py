@@ -52,8 +52,8 @@ with open(sys.argv[1], "rb") as f:
         data = f.read(6)
         area, score, rate, t1, t2 = unpack("<HBBBB", data)
 
-        print(i+1, binascii.hexlify(data).decode(),
-                   areas[area], score, rate, types[t1], types[t2])
+        print((i+1, binascii.hexlify(data).decode(),
+                   areas[area], score, rate, types[t1], types[t2]))
 
         obj = PalPark()
         obj.species_id = i+1

@@ -18,7 +18,7 @@ from sqlalchemy.sql.expression import func
 
 from pokedex.db import connect, tables, util
 
-sanity_re = re.compile(ur"^[-A-Za-z0-9 é\[\]{}.%':;,×/()\"|–`—!*♂♀\\]$")
+sanity_re = re.compile(r"^[-A-Za-z0-9 é\[\]{}.%':;,×/()\"|–`—!*♂♀\\]$")
 
 # RE that matches anything that might look like a link
 fuzzy_link_re = re.compile(r"""
@@ -105,27 +105,27 @@ def get_replacement(session, entire_text, context, matchobj):
             elif category == 'location':
                 table = tables.Location
             else:
-                print
-                print repr(entire_text)
-                print repr(matchobj.group(0))
+                print()
+                print(repr(entire_text))
+                print(repr(matchobj.group(0)))
                 raise ValueError('Category %s not implemented' % category)
             try:
                 thingy = util.get(session, table, target)
                 wanted_label = thingy.name
             except:
-                print
-                print repr(entire_text)
-                print repr(matchobj.group(0))
+                print()
+                print(repr(entire_text))
+                print(repr(matchobj.group(0)))
                 raise
         if wanted_label.lower() == label.lower():
             result = "[]{%s:%s}" % (category, target)
         else:
             result = "[%s]{%s:%s}" % (label, category, target)
             if wanted_label:
-                print
-                print context
-                print "%-40s" % matchobj.group(0),
-                print '%s != %s' % (label, wanted_label)
+                print()
+                print(context)
+                print("%-40s" % matchobj.group(0), end=' ')
+                print('%s != %s' % (label, wanted_label))
         assert result_link_re.match(result), result
     return result
 
@@ -144,7 +144,7 @@ def main(argv):
                     markdown = getattr(row, column.name)
                     if not markdown:
                         continue
-                    text = unicode(markdown)
+                    text = str(markdown)
                     # Make sure everything that remotely looks like a link is one
                     links = fuzzy_link_re.findall(text)
                     if not links:
@@ -161,9 +161,9 @@ def main(argv):
 
     if argv and argv[0] == '--commit':
         session.commit()
-        print 'Committed'
+        print('Committed')
     else:
-        print 'Run with --commit to commit changes'
+        print('Run with --commit to commit changes')
 
 if __name__ == '__main__':
     main(sys.argv[1:])

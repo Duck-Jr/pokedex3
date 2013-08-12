@@ -69,7 +69,7 @@ with open(argv[1], 'rb') as rom:
         ids = [410]
         rom.seek(2 * 409, 1)
     else:
-        ids = range(1, max_pokemon + 1)
+        ids = list(range(1, max_pokemon + 1))
 
     for pokemon in ids:
         # Read the flags
@@ -77,10 +77,10 @@ with open(argv[1], 'rb') as rom:
         for move in range(stuff['moves']):
             if flags & 1:
                 # This Pokémon learns this move!  Dump an SQL insert.
-                print(query_template.format(
+                print((query_template.format(
                     version=stuff['version_id'],
                     game_index=pokemon,
                     version_group=stuff['version_group_id'],
                     move=moves[move],
-                ))
+                )))
             flags >>= 1

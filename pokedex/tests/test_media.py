@@ -32,13 +32,13 @@ path_re = re.compile('^[-a-z0-9./]*$')
 
 def test_totodile(root):
     """Totodile's female sprite -- same as male"""
-    totodile = session.query(tables.PokemonSpecies).filter_by(identifier=u'totodile').one()
+    totodile = session.query(tables.PokemonSpecies).filter_by(identifier='totodile').one()
     accessor = media.PokemonSpeciesMedia(root, totodile)
     assert accessor.sprite() == accessor.sprite(female=True)
 
 def test_chimecho(root):
     """Chimecho's Platinum female backsprite -- diffeent from male"""
-    chimecho = session.query(tables.PokemonSpecies).filter_by(identifier=u'chimecho').one()
+    chimecho = session.query(tables.PokemonSpecies).filter_by(identifier='chimecho').one()
     accessor = media.PokemonSpeciesMedia(root, chimecho)
     male = accessor.sprite('platinum', back=True, frame=2)
     female = accessor.sprite('platinum', back=True, female=True, frame=2)
@@ -46,13 +46,13 @@ def test_chimecho(root):
 
 def test_venonat(root):
     """Venonat's shiny Yellow sprite -- same as non-shiny"""
-    venonat = session.query(tables.PokemonSpecies).filter_by(identifier=u'venonat').one()
+    venonat = session.query(tables.PokemonSpecies).filter_by(identifier='venonat').one()
     accessor = media.PokemonSpeciesMedia(root, venonat)
     assert accessor.sprite('yellow') == accessor.sprite('yellow', shiny=True)
 
 def test_arceus_icon(root):
     """Arceus fire-form icon -- same as base icon"""
-    arceus = session.query(tables.PokemonSpecies).filter_by(identifier=u'arceus').one()
+    arceus = session.query(tables.PokemonSpecies).filter_by(identifier='arceus').one()
     accessor = media.PokemonSpeciesMedia(root, arceus)
     fire_arceus = [f for f in arceus.forms if f.form_identifier == 'fire'][0]
     fire_accessor = media.PokemonFormMedia(root, fire_arceus)
@@ -61,16 +61,16 @@ def test_arceus_icon(root):
 def test_strict_castform(root):
     """Castform rainy form overworld with strict -- unavailable"""
     with pytest.raises(ValueError):
-        castform = session.query(tables.PokemonSpecies).filter_by(identifier=u'castform').first()
+        castform = session.query(tables.PokemonSpecies).filter_by(identifier='castform').first()
         rainy_castform = [f for f in castform.forms if f.form_identifier == 'rainy'][0]
-        print rainy_castform
+        print(rainy_castform)
         rainy_castform = media.PokemonFormMedia(root, rainy_castform)
         rainy_castform.overworld('up', strict=True)
 
 def test_strict_exeggcute(root):
     """Exeggcutes's female backsprite, with strict -- unavailable"""
     with pytest.raises(ValueError):
-        exeggcute = session.query(tables.PokemonSpecies).filter_by(identifier=u'exeggcute').one()
+        exeggcute = session.query(tables.PokemonSpecies).filter_by(identifier='exeggcute').one()
         accessor = media.PokemonSpeciesMedia(root, exeggcute)
         accessor.sprite(female=True, strict=True)
 
@@ -97,11 +97,11 @@ def hit(filenames, method, *args, **kwargs):
         medium = method(*args, **kwargs)
         #print 'Hit', medium.relative_path
         assert medium.exists
-    except ValueError, e:
+    except ValueError as e:
         #print 'DNF', e
         return False
     except:
-        print 'Error while processing', method, args, kwargs
+        print('Error while processing', method, args, kwargs)
         raise
     try:
         filenames.remove(medium.path)
@@ -125,10 +125,10 @@ def test_get_everything(root, pytestconfig):
     versions.append('red-green')
 
     # We don't have any graphics for Colosseum or XD
-    versions.remove(session.query(tables.Version).filter_by(identifier=u'colosseum').one())
-    versions.remove(session.query(tables.Version).filter_by(identifier=u'xd').one())
+    versions.remove(session.query(tables.Version).filter_by(identifier='colosseum').one())
+    versions.remove(session.query(tables.Version).filter_by(identifier='xd').one())
 
-    black = session.query(tables.Version).filter_by(identifier=u'black').one()
+    black = session.query(tables.Version).filter_by(identifier='black').one()
 
     filenames = get_all_filenames(root)
 
@@ -186,7 +186,7 @@ def test_get_everything(root, pytestconfig):
 
     accessors.append(media.UnknownPokemonMedia(root))
     accessors.append(media.EggMedia(root))
-    manaphy = session.query(tables.PokemonSpecies).filter_by(identifier=u'manaphy').one()
+    manaphy = session.query(tables.PokemonSpecies).filter_by(identifier='manaphy').one()
     accessors.append(media.EggMedia(root, manaphy))
     accessors.append(media.SubstituteMedia(root))
 
@@ -256,9 +256,9 @@ def test_get_everything(root, pytestconfig):
             unaccessed_filenames.remove(filename)
 
     if unaccessed_filenames:
-        print 'Unaccessed files:'
+        print('Unaccessed files:')
         for filename in unaccessed_filenames:
-            print filename
+            print(filename)
 
     assert unaccessed_filenames == set()
 

@@ -4,23 +4,23 @@ import pokedex.roomaji
 from pokedex.tests import positional_params
 
 @positional_params(
-        (u'ヤミカラス',         'yamikarasu'),
+        ('ヤミカラス',         'yamikarasu'),
 
         # Elongated vowel
-        (u'イーブイ',           'iibui'),
-        (u'ホーホー',           'hoohoo'),
-        (u'ピカチュウ',         u'pikachuu'),
+        ('イーブイ',           'iibui'),
+        ('ホーホー',           'hoohoo'),
+        ('ピカチュウ',         'pikachuu'),
 
         # Combined characters
-        (u'ニャース',           'nyaasu'),
-        (u'ジャ',               'ja'),
-        (u'ぎゃくてん',         'gyakuten'),
-        (u'ウェザーボール',     'wezaabooru'),
+        ('ニャース',           'nyaasu'),
+        ('ジャ',               'ja'),
+        ('ぎゃくてん',         'gyakuten'),
+        ('ウェザーボール',     'wezaabooru'),
 
         # Special katakana combinations
-        (u'ラティアス',         'ratiasu'),
-        (u'ウィー',             'wii'),
-        (u'セレビィ',           'sereby'),
+        ('ラティアス',         'ratiasu'),
+        ('ウィー',             'wii'),
+        ('セレビィ',           'sereby'),
     )
 def test_roomaji(kana, roomaji):
     result = pokedex.roomaji.romanize(kana)
@@ -28,23 +28,23 @@ def test_roomaji(kana, roomaji):
 
 
 @positional_params(
-        (u'ヤミカラス',         u'jamikarasu'),
+        ('ヤミカラス',         'jamikarasu'),
 
         # Elongated vowel
-        (u'イーブイ',           u'íbui'),
-        (u'ホーホー',           u'hóhó'),
-        (u'ピカチュウ',         u'pikačú'),
+        ('イーブイ',           'íbui'),
+        ('ホーホー',           'hóhó'),
+        ('ピカチュウ',         'pikačú'),
 
         # Combined characters
-        (u'ニャース',           u'ňjásu'),
-        (u'ジャ',              u'dža'),
-        (u'ぎゃくてん',         u'gjakuten'),
-        (u'ウェザーボール',     u'wezábóru'),
+        ('ニャース',           'ňjásu'),
+        ('ジャ',              'dža'),
+        ('ぎゃくてん',         'gjakuten'),
+        ('ウェザーボール',     'wezábóru'),
 
         # Special katakana combinations
-        (u'ラティアス',         u'ratiasu'),
-        (u'ウィー',             u'wí'),
-        (u'セレビィ',           u'serebí'),
+        ('ラティアス',         'ratiasu'),
+        ('ウィー',             'wí'),
+        ('セレビィ',           'serebí'),
     )
 def test_roomaji_cs(kana, roomaji):
     result = pokedex.roomaji.romanize(kana, 'cs')

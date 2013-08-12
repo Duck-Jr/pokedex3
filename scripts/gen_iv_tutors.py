@@ -47,11 +47,11 @@ with open('/tmp/pt/overlay9/overlay_00000005.bin', 'rb') as overlay:
                 flag_byte, = overlay.read(1)
 
             if flag_byte & 1:
-                print(insert_template.format(
+                print((insert_template.format(
                     pokemon=pokemon,
                     version_group=9,
                     move=move
-                ))
+                )))
 
             flag_byte >>= 1
 
@@ -83,11 +83,11 @@ with open('/tmp/hg/fsroot/fielddata/wazaoshie/waza_oshie.bin', 'rb') as flagbin:
 
         for n, move in enumerate(moves):
             if flags & 1:
-                print(insert_template.format(
+                print((insert_template.format(
                     pokemon=pokemon,
                     version_group=10,
                     move=move
-                ))
+                )))
 
             flags >>= 1
 

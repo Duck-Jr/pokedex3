@@ -19,10 +19,10 @@ csv_dir = defaults.get_default_csv_dir()
 def to_dict(filename):
     fullname = os.path.join(csv_dir, filename)
     reader = csv.reader(open(fullname))
-    column_names = reader.next()
+    column_names = next(reader)
     entries = dict()
     for row in reader:
-        row_dict = dict(zip(column_names, row))
+        row_dict = dict(list(zip(column_names, row)))
         entries[row_dict.get('id', row_dict.get('pokemon_id'))] = row_dict
     return entries, column_names
 
@@ -56,8 +56,8 @@ def put(dct, entry):
         if entry == dct[id]:
             pass
         else:
-            print entry
-            print dct[id]
+            print(entry)
+            print(dct[id])
             assert False
     else:
         dct[id] = entry
@@ -89,7 +89,7 @@ result_pokemon = dict()
 result_forms = dict()
 result_chains = dict()
 
-for form_id, source_form in forms.items():
+for form_id, source_form in list(forms.items()):
     pokemon_id = source_form['unique_pokemon_id'] or source_form['form_base_pokemon_id']
     species_id = source_form['form_base_pokemon_id']
     source_pokemon = pokemon[pokemon_id]

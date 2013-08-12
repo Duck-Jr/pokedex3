@@ -18,4 +18,4 @@ def pytest_generate_tests(metafunc):
     for funcargs in getattr(metafunc.function, 'funcarglist', ()):
         metafunc.addcall(funcargs=funcargs)
     for posargs in getattr(metafunc.function, 'posarglist', ()):
-        metafunc.addcall(funcargs=dict(zip(metafunc.funcargnames, posargs)))
+        metafunc.addcall(funcargs=dict(list(zip(metafunc.funcargnames, posargs))))

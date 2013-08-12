@@ -83,7 +83,7 @@ class MediaFile(object):
 
 class BaseMedia(object):
     def __init__(self, root):
-        if isinstance(root, basestring):
+        if isinstance(root, str):
             self.file_class = partial(MediaFile, root)
         else:
             self.file_class = root
@@ -179,7 +179,7 @@ class _BasePokemonMedia(BaseMedia):
 
         If the sprite is not found, raise a ValueError.
         """
-        if isinstance(version, basestring):
+        if isinstance(version, str):
             version_dir = version
             try:
                 generation, info = self._pokemon_sprite_info[version_dir]

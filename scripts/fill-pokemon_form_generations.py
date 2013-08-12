@@ -60,7 +60,7 @@ for form in q:
     species_ident = form.species.identifier
     form_ident = form.form_identifier
     is_default = form.is_default and form.pokemon.is_default
-    print form_ident, species_ident
+    print(form_ident, species_ident)
     for gen in generations:
         game_index = None
         if gen.id >= form.version_group.generation_id:
@@ -125,7 +125,7 @@ q = session.query(tables.PokemonFormGeneration)
 for species in session.query(tables.PokemonSpecies).options(
         eagerload_all('forms', 'pokemon_form_generations')):
     if len(species.forms) > 1:
-        print species.name
+        print(species.name)
     for gen in generations:
         if len(species.forms) == 1:
             pfg = q.get((species.forms[0].id, gen.id))
@@ -136,8 +136,8 @@ for species in session.query(tables.PokemonSpecies).options(
         if forms:
             forms.sort()
             pl = ["%s=%s" % (gi, f.form_identifier) for gi, f in forms]
-            print '   ', gen.id, ' '.join(pl)
+            print('   ', gen.id, ' '.join(pl))
 
 load.dump(session, tables=['pokemon_form_generations'])
-print "Dumped to CSV, rolling back transaction"
+print("Dumped to CSV, rolling back transaction")
 session.rollback()

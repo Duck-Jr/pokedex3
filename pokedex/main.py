@@ -58,8 +58,8 @@ def get_session(options):
     session = pokedex.db.connect(engine_uri)
 
     if options.verbose:
-        print "Connected to database %(engine)s (from %(got_from)s)" \
-            % dict(engine=session.bind.url, got_from=got_from)
+        print("Connected to database %(engine)s (from %(got_from)s)" \
+            % dict(engine=session.bind.url, got_from=got_from))
 
     return session
 
@@ -78,8 +78,8 @@ def get_lookup(options, session=None, recreate=False):
         index_dir, got_from = defaults.get_default_index_dir_with_origin()
 
     if options.verbose:
-        print "Opened lookup index %(index_dir)s (from %(got_from)s)" \
-            % dict(index_dir=index_dir, got_from=got_from)
+        print("Opened lookup index %(index_dir)s (from %(got_from)s)" \
+            % dict(index_dir=index_dir, got_from=got_from))
 
     lookup = pokedex.lookup.PokedexLookup(index_dir, session=session)
 
@@ -100,8 +100,8 @@ def get_csv_directory(options):
     if csvdir is None:
         csvdir, got_from = defaults.get_default_csv_dir_with_origin()
 
-    print "Using CSV directory %(csvdir)s (from %(got_from)s)" \
-        % dict(csvdir=csvdir, got_from=got_from)
+    print("Using CSV directory %(csvdir)s (from %(got_from)s)" \
+        % dict(csvdir=csvdir, got_from=got_from))
 
     return csvdir
 
@@ -139,11 +139,11 @@ def command_load(*args):
     options, tables = parser.parse_args(list(args))
 
     if not options.engine_uri:
-        print "WARNING: You're reloading the default database, but not the lookup index.  They"
-        print "         might get out of sync, and pokedex commands may not work correctly!"
-        print "To fix this, run `pokedex reindex` when this command finishes.  Or, just use"
-        print "`pokedex setup` to do both at once."
-        print
+        print("WARNING: You're reloading the default database, but not the lookup index.  They")
+        print("         might get out of sync, and pokedex commands may not work correctly!")
+        print("To fix this, run `pokedex reindex` when this command finishes.  Or, just use")
+        print("`pokedex setup` to do both at once.")
+        print()
 
     if options.langs == 'none':
         langs = []
@@ -170,7 +170,7 @@ def command_reindex(*args):
     session = get_session(options)
     lookup = get_lookup(options, session=session, recreate=True)
 
-    print "Recreated lookup index."
+    print("Recreated lookup index.")
 
 
 def command_setup(*args):
@@ -187,7 +187,7 @@ def command_setup(*args):
 
     lookup = get_lookup(options, session=session, recreate=True)
 
-    print "Recreated lookup index."
+    print("Recreated lookup index.")
 
 
 def command_status(*args):
@@ -198,37 +198,37 @@ def command_status(*args):
 
     # Database, and a lame check for whether it's been inited at least once
     session = get_session(options)
-    print "  - OK!  Connected successfully."
+    print("  - OK!  Connected successfully.")
 
     if pokedex.db.tables.Pokemon.__table__.exists(session.bind):
-        print "  - OK!  Database seems to contain some data."
+        print("  - OK!  Database seems to contain some data.")
     else:
-        print "  - WARNING: Database appears to be empty."
+        print("  - WARNING: Database appears to be empty.")
 
     # CSV; simple checks that the dir exists
     csvdir = get_csv_directory(options)
     if not os.path.exists(csvdir):
-        print "  - ERROR: No such directory!"
+        print("  - ERROR: No such directory!")
     elif not os.path.isdir(csvdir):
-        print "  - ERROR: Not a directory!"
+        print("  - ERROR: Not a directory!")
     else:
-        print "  - OK!  Directory exists."
+        print("  - OK!  Directory exists.")
 
         if os.access(csvdir, os.R_OK):
-            print "  - OK!  Can read from directory."
+            print("  - OK!  Can read from directory.")
         else:
-            print "  - ERROR: Can't read from directory!"
+            print("  - ERROR: Can't read from directory!")
 
         if os.access(csvdir, os.W_OK):
-            print "  - OK!  Can write to directory."
+            print("  - OK!  Can write to directory.")
         else:
-            print "  - WARNING: Can't write to directory!  " \
-                "`dump` will not work.  You may need to sudo."
+            print("  - WARNING: Can't write to directory!  " \
+                "`dump` will not work.  You may need to sudo.")
 
     # Index; the PokedexLookup constructor covers most tests and will
     # cheerfully bomb if they fail
     lookup = get_lookup(options, recreate=False)
-    print "  - OK!  Opened successfully."
+    print("  - OK!  Opened successfully.")
 
 
 ### User-facing commands
@@ -237,18 +237,18 @@ def command_lookup(*args):
     parser = get_parser(verbose=False)
     options, words = parser.parse_args(list(args))
 
-    name = u' '.join(words)
+    name = ' '.join(words)
 
     session = get_session(options)
     lookup = get_lookup(options, session=session, recreate=False)
 
     results = lookup.lookup(name)
     if not results:
-        print "No matches."
+        print("No matches.")
     elif results[0].exact:
-        print "Matched:"
+        print("Matched:")
     else:
-        print "Fuzzy-matched:"
+        print("Fuzzy-matched:")
 
     for result in results:
         if hasattr(result.object, 'full_name'):
@@ -256,15 +256,15 @@ def command_lookup(*args):
         else:
             name = result.object.name
 
-        print "%s: %s" % (result.object.__tablename__, name),
+        print("%s: %s" % (result.object.__tablename__, name), end=' ')
         if result.language:
-            print "(%s in %s)" % (result.name, result.language)
+            print("(%s in %s)" % (result.name, result.language))
         else:
-            print
+            print()
 
 
 def command_help():
-    print u"""pokedex -- a command-line Pokédex interface
+    print("""pokedex -- a command-line Pokédex interface
 usage: pokedex {command} [options...]
 Run `pokedex setup` first, or nothing will work!
 See https://github.com/veekun/pokedex/wiki/CLI for more documentation.
@@ -316,7 +316,7 @@ Dump options:
 
     Additionally, load and dump accept a list of table names (possibly with
     wildcards) and/or csv fileames as an argument list.
-""".encode(sys.getdefaultencoding(), 'replace')
+""".encode(sys.getdefaultencoding(), 'replace'))
 
     sys.exit(0)
 

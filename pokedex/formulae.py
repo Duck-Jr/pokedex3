@@ -1,8 +1,9 @@
 # encoding: utf8
 """Faithful translations of calculations the games make."""
-from __future__ import division
+from functools import reduce
 
-from itertools import izip
+
+
 
 def nCr(n, r):
     """n-choose-r.
@@ -13,8 +14,8 @@ def nCr(n, r):
 
     return reduce(
         lambda x, y: x * y[0] / y[1],
-        izip(xrange(n - r + 1, n + 1),
-             xrange(1, r + 1)),
+        zip(range(n - r + 1, n + 1),
+             range(1, r + 1)),
         1)
 
 

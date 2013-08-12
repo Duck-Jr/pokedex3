@@ -8,29 +8,29 @@ lookup = PokedexLookup()
 
 @positional_params(
         # Simple lookups
-        (u'Eevee',          'pokemon_species',133),
-        (u'Scratch',        'moves',        10),
-        (u'Master Ball',    'items',        1),
-        (u'normal',         'types',        1),
-        (u'Run Away',       'abilities',    50),
+        ('Eevee',          'pokemon_species',133),
+        ('Scratch',        'moves',        10),
+        ('Master Ball',    'items',        1),
+        ('normal',         'types',        1),
+        ('Run Away',       'abilities',    50),
 
         # Funny characters
-        (u'Mr. Mime',       'pokemon_species', 122),
-        (u"Farfetch'd",     'pokemon_species', 83),
-        (u'Poké Ball',      'items',           4),
+        ('Mr. Mime',       'pokemon_species', 122),
+        ("Farfetch'd",     'pokemon_species', 83),
+        ('Poké Ball',      'items',           4),
 
         # Forms
-        (u'Rotom',          'pokemon_species', 479),
-        (u'Wash Rotom',     'pokemon_forms',   708),
-        (u'East Shellos',   'pokemon_forms',   688),
+        ('Rotom',          'pokemon_species', 479),
+        ('Wash Rotom',     'pokemon_forms',   708),
+        ('East Shellos',   'pokemon_forms',   688),
 
         # Other languages
-        (u'イーブイ',       'pokemon_species', 133),
-        (u'Iibui',          'pokemon_species', 133),
-        (u'Eievui',         'pokemon_species', 133),
-        (u'이브이',         'pokemon_species', 133),
-        (u'伊布',           'pokemon_species', 133),
-        (u'Evoli',          'pokemon_species', 133),
+        ('イーブイ',       'pokemon_species', 133),
+        ('Iibui',          'pokemon_species', 133),
+        ('Eievui',         'pokemon_species', 133),
+        ('이브이',         'pokemon_species', 133),
+        ('伊布',           'pokemon_species', 133),
+        ('Evoli',          'pokemon_species', 133),
     )
 def test_exact_lookup(input, table, id):
     results = lookup.lookup(input)
@@ -43,60 +43,60 @@ def test_exact_lookup(input, table, id):
 
 
 def test_id_lookup():
-    results = lookup.lookup(u'1')
+    results = lookup.lookup('1')
     assert len(results) >= 5
     assert all(result.object.id == 1 for result in results)
 
 
 def test_multi_lookup():
-    results = lookup.lookup(u'Metronome')
+    results = lookup.lookup('Metronome')
     assert len(results) == 2
     assert results[0].exact
 
 
 def test_type_lookup():
-    results = lookup.lookup(u'pokemon:1')
+    results = lookup.lookup('pokemon:1')
     assert results[0].object.__tablename__ == 'pokemon_species'
     assert len(results) == 1
-    assert results[0].object.name == u'Bulbasaur'
+    assert results[0].object.name == 'Bulbasaur'
 
-    results = lookup.lookup(u'1', valid_types=['pokemon_species'])
-    assert results[0].object.name == u'Bulbasaur'
+    results = lookup.lookup('1', valid_types=['pokemon_species'])
+    assert results[0].object.name == 'Bulbasaur'
 
 
 def test_language_lookup():
     # There are two objects named "charge": the move Charge, and the move
     # Tackle, which is called "Charge" in French.
-    results = lookup.lookup(u'charge')
+    results = lookup.lookup('charge')
     assert len(results) > 1
 
-    results = lookup.lookup(u'@fr:charge')
-    assert results[0].iso639 == u'fr'
+    results = lookup.lookup('@fr:charge')
+    assert results[0].iso639 == 'fr'
     assert len(results) == 1
-    assert results[0].object.name == u'Tackle'
+    assert results[0].object.name == 'Tackle'
 
-    results = lookup.lookup(u'charge', valid_types=['@fr'])
-    assert results[0].object.name == u'Tackle'
+    results = lookup.lookup('charge', valid_types=['@fr'])
+    assert results[0].object.name == 'Tackle'
 
-    results = lookup.lookup(u'@fr,move:charge')
-    assert results[0].object.name == u'Tackle'
+    results = lookup.lookup('@fr,move:charge')
+    assert results[0].object.name == 'Tackle'
 
-    results = lookup.lookup(u'@fr:charge', valid_types=['move'])
-    assert results[0].object.name, u'Tackle'
+    results = lookup.lookup('@fr:charge', valid_types=['move'])
+    assert results[0].object.name, 'Tackle'
 
 
 @positional_params(
         # Regular English names
-        (u'chamander',          u'Charmander'),
-        (u'pokeball',           u'Poké Ball'),
+        ('chamander',          'Charmander'),
+        ('pokeball',           'Poké Ball'),
 
         # Names with squiggles in them
-        (u'farfetchd',          u"Farfetch'd"),
-        (u'porygonz',           u'Porygon-Z'),
+        ('farfetchd',          "Farfetch'd"),
+        ('porygonz',           'Porygon-Z'),
 
         # Sufficiently long foreign names
-        (u'カクレオ',           u'Kecleon'),
-        (u'Yamikrasu',          u'Murkrow'),
+        ('カクレオ',           'Kecleon'),
+        ('Yamikrasu',          'Murkrow'),
     )
 def test_fuzzy_lookup(misspelling, name):
     results = lookup.lookup(misspelling)
@@ -105,16 +105,16 @@ def test_fuzzy_lookup(misspelling, name):
 
 
 def test_nidoran():
-    results = lookup.lookup(u'Nidoran')
+    results = lookup.lookup('Nidoran')
     top_names = [result.object.name for result in results[0:2]]
-    assert u'Nidoran♂' in top_names
-    assert u'Nidoran♀' in top_names
+    assert 'Nidoran♂' in top_names
+    assert 'Nidoran♀' in top_names
 
 
 @positional_params(
-        (u'pokemon:*meleon',    u'Charmeleon'),
-        (u'item:master*',       u'Master Ball'),
-        (u'ee?ee',              u'Eevee'),
+        ('pokemon:*meleon',    'Charmeleon'),
+        ('item:master*',       'Master Ball'),
+        ('ee?ee',              'Eevee'),
     )
 def test_wildcard_lookup(wildcard, name):
     results = lookup.lookup(wildcard)
@@ -124,24 +124,24 @@ def test_wildcard_lookup(wildcard, name):
 
 def test_bare_random():
     for i in range(5):
-        results = lookup.lookup(u'random')
+        results = lookup.lookup('random')
         assert len(results) == 1
 
 
 @positional_params(
-        [u'pokemon_species'],
-        [u'moves'],
-        [u'items'],
-        [u'abilities'],
-        [u'types'],
+        ['pokemon_species'],
+        ['moves'],
+        ['items'],
+        ['abilities'],
+        ['types'],
     )
 def test_qualified_random(table_name):
-    results = lookup.lookup(u'random', valid_types=[table_name])
+    results = lookup.lookup('random', valid_types=[table_name])
     assert len(results) == 1
     assert results[0].object.__tablename__ == table_name
 
 
 def test_crash_empty_prefix():
     """Searching for ':foo' used to crash, augh!"""
-    results = lookup.lookup(u':Eevee')
-    assert results[0].object.name == u'Eevee'
+    results = lookup.lookup(':Eevee')
+    assert results[0].object.name == 'Eevee'

@@ -42,7 +42,7 @@ def test_types_french_order():
     assert types[0].name_map[french] == 'Acier', types[0].name_map[french]
     assert types[-1].name_map[french] == 'Vol', types[-1].name_map[french]
 
-@single_params(*range(1, 10) * 2)
+@single_params(*list(range(1, 10)) * 2)
 def test_get_pokemon_id(id):
     result = util.get(session, tables.Pokemon, id=id)
     assert result.id == id

@@ -92,7 +92,7 @@ def order_by_name(query, table, language=None, *extra_languages, **kwargs):
     """
     name_attribute = kwargs.pop('name', 'name')
     if kwargs:
-        raise ValueError('Unexpected keyword arguments: %s' % kwargs.keys())
+        raise ValueError('Unexpected keyword arguments: %s' % list(kwargs.keys()))
     order_columns = []
     if language is None:
         query = query.outerjoin(table.names_local)

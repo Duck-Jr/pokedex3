@@ -52,8 +52,8 @@ source_encoding = 'utf-8'
 master_doc = 'index'
 
 # General information about the project.
-project = u'pokedex'
-copyright = u'2011, Alex Munroe (Eevee)'
+project = 'pokedex'
+copyright = '2011, Alex Munroe (Eevee)'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -192,8 +192,8 @@ htmlhelp_basename = 'pokedexdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'pokedex.tex', u'Pokedex Documentation',
-   u'veekun', 'manual'),
+  ('index', 'pokedex.tex', 'Pokedex Documentation',
+   'veekun', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -225,6 +225,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pokedex', u'Pokedex Documentation',
-     [u'veekun'], 1)
+    ('index', 'pokedex', 'Pokedex Documentation',
+     ['veekun'], 1)
 ]

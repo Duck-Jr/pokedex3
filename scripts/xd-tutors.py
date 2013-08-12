@@ -32,7 +32,7 @@ for move_identifier in '''
         thunder-wave
         '''.split():
     move = util.get(session, tables.Move, move_identifier)
-    print move
+    print(move)
     query = session.query(tables.PokemonMove.pokemon_id)
     query = query.filter_by(method=tutor)
     query = query.filter_by(move=move)
@@ -78,7 +78,7 @@ xd_tutor_data = {
     'zap-cannon': ['mew'],
     }
 
-for move_identifier, pokemon_identifiers in xd_tutor_data.items():
+for move_identifier, pokemon_identifiers in list(xd_tutor_data.items()):
     move = util.get(session, tables.Move, move_identifier)
     for pokemon_identifier in pokemon_identifiers:
         species = util.get(session, tables.PokemonSpecies, pokemon_identifier)
@@ -87,7 +87,7 @@ for move_identifier, pokemon_identifiers in xd_tutor_data.items():
         except ValueError:
             assert pokemon_identifier == 'deoxys'
             pokemon = species.default_pokemon
-        print move, pokemon
+        print(move, pokemon)
 
         pokemon_move = tables.PokemonMove()
         pokemon_move.pokemon = pokemon
@@ -109,7 +109,7 @@ for pokemon_id, move_id, level, order in set(
         .filter_by(version_group=emerald_version_group)
     ):
     for version_group in xd_version_group, colo_version_group:
-        print pokemon_id, move_id
+        print(pokemon_id, move_id)
         pokemon_move = tables.PokemonMove()
         pokemon_move.pokemon_id = pokemon_id
         pokemon_move.move_id = move_id

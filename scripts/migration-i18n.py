@@ -17,7 +17,7 @@ reference.
 import csv
 import re
 import os
-from StringIO import StringIO
+from io import StringIO
 from collections import namedtuple, defaultdict
 
 from sqlalchemy.orm import class_mapper
@@ -110,12 +110,12 @@ class MakeFieldFuncs:
 
 def name2ident(name):
     ident = name.decode('utf-8').lower()
-    ident = ident.replace(u'+', ' plus ')
-    ident = re.sub(u'[ _–]+', u'-', ident)
-    ident = re.sub(u'[\'./;’(),:]', u'', ident)
-    ident = ident.replace(u'é', 'e')
-    ident = ident.replace(u'♀', '-f')
-    ident = ident.replace(u'♂', '-m')
+    ident = ident.replace('+', ' plus ')
+    ident = re.sub('[ _–]+', '-', ident)
+    ident = re.sub('[\'./;’(),:]', '', ident)
+    ident = ident.replace('é', 'e')
+    ident = ident.replace('♀', '-f')
+    ident = ident.replace('♂', '-m')
     if ident in ('???', '????'):
         ident = 'unknown'
     elif ident == '!':
@@ -137,10 +137,10 @@ def main():
             # This is an auxilliary table; it'll be processed with the main one
             continue
         else:
-            print "%s: %s" % (classname, table.__tablename__)
+            print("%s: %s" % (classname, table.__tablename__))
         with open(datafilename) as datafile:
             datacsv = csv.reader(datafile, lineterminator='\n')
-            orig_fields = datacsv.next()
+            orig_fields = next(datacsv)
             columns = class_mapper(table).c
             new_fields = []
             main_out = []
@@ -164,14 +164,14 @@ def main():
             headers = {datafilename: list(field.name for field in new_fields)}
             # Pretty prnt :)
             for field in new_fields:
-                print '    [{0.func.func_name:5}] {0.name}'.format(field)
+                print('    [{0.func.func_name:5}] {0.name}'.format(field))
             # Do pretty much the same for aux tables
             aux_tables = []
             for attrname in 'text_table prose_table'.split():
                 aux_table = getattr(table, attrname, None)
                 if aux_table:
                     aux_datafilename = dir + '/' + aux_table.__tablename__ + '.csv'
-                    print "  %s: %s" % (aux_table.__name__, aux_table.__tablename__)
+                    print("  %s: %s" % (aux_table.__name__, aux_table.__tablename__))
                     srcfiles.append(datafilename)
                     aux_tables.append(aux_table)
                     columns = class_mapper(aux_table).c
@@ -200,7 +200,7 @@ def main():
                         elif name == 'lang_id':
                             aux_fields.append(FieldSpec(aux_datafilename, column.name, MakeFieldFuncs.srcid))
                         else:
-                            print orig_fields
+                            print(orig_fields)
                             raise AssertionError(name)
                         if name == 'name':
                             # If this table contains the name, remember that
@@ -221,16 +221,16 @@ def main():
                     headers[aux_datafilename] = list(field.name for field in aux_fields)
                     # Pretty print :)
                     for field in aux_fields:
-                        print '    [{0.func.func_name:5}] {0.name}'.format(field)
+                        print('    [{0.func.func_name:5}] {0.name}'.format(field))
             # Do nothing if the table's the same
             if all(field.func == MakeFieldFuncs.copy for field in new_fields):
-                print u'  → skipping'
+                print('  → skipping')
                 continue
             # Otherwise read the file
             # outputs will be a (filename -> list of rows) dict
-            print u'  → reading'
+            print('  → reading')
             for autoincrement_id, src_row in enumerate(datacsv, start=1):
-                row = dict(zip(orig_fields, src_row))
+                row = dict(list(zip(orig_fields, src_row)))
                 new_rows = defaultdict(list)
                 for field in new_fields:
                     new_rows[field.out].append(field.func(
@@ -238,7 +238,7 @@ def main():
                             field_name=field.name,
                             i=autoincrement_id,
                         ))
-                for name, row in new_rows.items():
+                for name, row in list(new_rows.items()):
                     outputs[name].append(row)
         # If there was a _names table, read that and append it to the
         # aux table that has names
@@ -248,22 +248,22 @@ def main():
         except (AttributeError, IOError):
             pass
         else:
-            print u'  → reading foreign names'
+            print('  → reading foreign names')
             with name_file:
                 namecsv = csv.reader(name_file, lineterminator='\n')
-                src_fields = namecsv.next()
+                src_fields = next(namecsv)
                 obj_id_fieldname = table.__singlename__ + '_id'
                 assert src_fields == [obj_id_fieldname, 'language_id', 'name']
                 for name_row in namecsv:
-                    name_dict = dict(zip(src_fields, name_row))
+                    name_dict = dict(list(zip(src_fields, name_row)))
                     row = []
                     for field in name_fields:
                         row.append(name_dict.get(field.name, ''))
                     name_out.append(row)
             os.unlink(name_datafilename)
         # For all out files, write a header & sorted rows
-        print u'  → writing'
-        for filename, rows in outputs.items():
+        print('  → writing')
+        for filename, rows in list(outputs.items()):
             with open(filename, 'w') as outfile:
                 outcsv = csv.writer(outfile, lineterminator='\n')
                 outcsv.writerow(headers[filename])

@@ -1,5 +1,5 @@
 # encoding: utf8
-u"""
+"""
 Handles reading and encryption/decryption of Pokémon save file data.
 
 See: http://projectpokemon.org/wiki/Pokemon_NDS_Structure
@@ -16,7 +16,7 @@ from pokedex.compatibility import namedtuple, permutations
 from pokedex.struct._pokemon_struct import pokemon_struct
 
 def pokemon_prng(seed):
-    u"""Creates a generator that simulates the main Pokémon PRNG."""
+    """Creates a generator that simulates the main Pokémon PRNG."""
     while True:
         seed = 0x41C64E6D * seed + 0x6073
         seed &= 0xFFFFFFFF
@@ -24,7 +24,7 @@ def pokemon_prng(seed):
 
 
 class SaveFilePokemon(object):
-    u"""Represents an individual Pokémon, from the game's point of view.
+    """Represents an individual Pokémon, from the game's point of view.
 
     Handles translating between the on-disk encrypted form, the in-RAM blob
     (also used by pokesav), and something vaguely intelligible.
@@ -33,7 +33,7 @@ class SaveFilePokemon(object):
     Stat = namedtuple('Stat', ['stat', 'base', 'gene', 'exp', 'calc'])
 
     def __init__(self, blob, encrypted=False):
-        u"""Wraps a Pokémon save struct in a friendly object.
+        """Wraps a Pokémon save struct in a friendly object.
 
         If `encrypted` is True, the blob will be decrypted as though it were an
         on-disk save.  Otherwise, the blob is taken to be already decrypted and
@@ -62,12 +62,12 @@ class SaveFilePokemon(object):
 
     @property
     def as_struct(self):
-        u"""Returns a decrypted struct, aka .pkm file."""
+        """Returns a decrypted struct, aka .pkm file."""
         return self.blob
 
     @property
     def as_encrypted(self):
-        u"""Returns an encrypted struct the game expects in a save file."""
+        """Returns an encrypted struct the game expects in a save file."""
 
         # Interpret as one word (pid), followed by a bunch of shorts
         struct_def = "I" + "H" * ((len(self.blob) - 4) / 2)
@@ -83,7 +83,7 @@ class SaveFilePokemon(object):
     ### Delicious data
     @property
     def is_shiny(self):
-        u"""Returns true iff this Pokémon is shiny."""
+        """Returns true iff this Pokémon is shiny."""
         # See http://bulbapedia.bulbagarden.net/wiki/Personality#Shininess
         # But don't see it too much, because the above is super over
         # complicated.  Do this instead!
@@ -137,7 +137,7 @@ class SaveFilePokemon(object):
             gene = st.ivs['iv_' + structure_name]
             exp  = st['effort_' + structure_name]
 
-            if pokemon_stat.stat.name == u'HP':
+            if pokemon_stat.stat.name == 'HP':
                 calc = calculated_hp
             else:
                 calc = calculated_stat
@@ -266,7 +266,7 @@ class SaveFilePokemon(object):
 
     ### Utility methods
 
-    shuffle_orders = list( permutations(range(4)) )
+    shuffle_orders = list( permutations(list(range(4))) )
 
     @classmethod
     def shuffle_chunks(cls, words, reverse=False):
@@ -298,7 +298,7 @@ class SaveFilePokemon(object):
 
     @classmethod
     def reciprocal_crypt(cls, words):
-        u"""Applies the reciprocal Pokémon save file cipher to the provided
+        """Applies the reciprocal Pokémon save file cipher to the provided
         list of words.
 
         Returns nothing; the list is changed in-place.

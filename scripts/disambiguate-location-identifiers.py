@@ -37,17 +37,17 @@ def main(*argv):
                 ambiguous_re.match(identifier),
                 identifier in ambiguous_set,
             ))
-        print len(locations), ' *'[disambiguate], identifier,
+        print(len(locations), ' *'[disambiguate], identifier, end=' ')
         if disambiguate:
             changes = True
-            print u'→'.encode('utf-8'),
+            print('→'.encode('utf-8'), end=' ')
             by_region = defaultdict(list)
             for location in locations:
                 if location.region:
                     by_region[location.region.identifier].append(location)
                 else:
                     by_region[None].append(location)
-            for region_identifier, region_locations in by_region.items():
+            for region_identifier, region_locations in list(by_region.items()):
                 if region_identifier:
                     new_identifier = '%s-%s' % (region_identifier, identifier)
                 else:
@@ -56,24 +56,24 @@ def main(*argv):
                 if len(region_locations) == 1:
                     location = region_locations[0]
                     # The region was enough
-                    print new_identifier,
+                    print(new_identifier, end=' ')
                     location.identifier = new_identifier
                 else:
                     # Need to number the locations :(
                     for i, location in enumerate(region_locations, start=1):
                         numbered_identifier = '%s-%s' % (new_identifier, i)
-                        print numbered_identifier,
+                        print(numbered_identifier, end=' ')
                         location.identifier = numbered_identifier
-        print
+        print()
 
     if changes:
         if argv and argv[0] == '--commit':
             session.commit()
-            print 'Committed'
+            print('Committed')
         else:
-            print 'Run with --commit to commit changes'
+            print('Run with --commit to commit changes')
     else:
-        print 'No changes needed'
+        print('No changes needed')
 
 
 if __name__ == '__main__':

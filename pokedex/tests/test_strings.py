@@ -11,18 +11,18 @@ connection = connect()
 
 def test_filter():
     q = connection.query(tables.PokemonSpecies).filter(
-            tables.PokemonSpecies.name == u"Marowak")
+            tables.PokemonSpecies.name == "Marowak")
     assert q.one().identifier == 'marowak'
 
 def test_languages():
     q = connection.query(tables.PokemonSpecies).filter(
-            tables.PokemonSpecies.name == u"Mightyena")
+            tables.PokemonSpecies.name == "Mightyena")
     pkmn = q.one()
     for lang, name in (
-            ('en', u'Mightyena'),
-            ('ja', u'グラエナ'),
-            ('roomaji', u'Guraena'),
-            ('fr', u'Grahyèna'),
+            ('en', 'Mightyena'),
+            ('ja', 'グラエナ'),
+            ('roomaji', 'Guraena'),
+            ('fr', 'Grahyèna'),
         ):
         language = connection.query(tables.Language).filter_by(
                 identifier=lang).one()
@@ -31,29 +31,29 @@ def test_languages():
 def test_bad_lang():
     with pytest.raises(KeyError):
         q = connection.query(tables.PokemonSpecies).filter(
-                tables.PokemonSpecies.name == u"Mightyena")
+                tables.PokemonSpecies.name == "Mightyena")
         pkmn = q.one()
         pkmn.names["identifier of a language that doesn't exist"]
 
 def test_mutating():
     item = connection.query(tables.Item).filter_by(
-            identifier=u"jade-orb").one()
+            identifier="jade-orb").one()
     language = connection.query(tables.Language).filter_by(
-            identifier=u"de").one()
-    item.name_map[language] = u"foo"
+            identifier="de").one()
+    item.name_map[language] = "foo"
     assert item.name_map[language] == "foo"
-    item.name_map[language] = u"xyzzy"
+    item.name_map[language] = "xyzzy"
     assert item.name_map[language] == "xyzzy"
 
 def test_mutating_default():
     item = connection.query(tables.Item).filter_by(
-            identifier=u"jade-orb").one()
-    item.name = u"foo"
+            identifier="jade-orb").one()
+    item.name = "foo"
     assert item.name == "foo"
 
 def test_string_mapping():
     item = connection.query(tables.Item).filter_by(
-            identifier=u"jade-orb").one()
+            identifier="jade-orb").one()
     assert len(item.name_map) == len(item.names)
     for lang in item.names:
         assert item.name_map[lang] == item.names[lang].name
@@ -63,37 +63,37 @@ def test_string_mapping():
 
 def test_new_language():
     item = connection.query(tables.Item).filter_by(
-            identifier=u"jade-orb").one()
+            identifier="jade-orb").one()
     language = tables.Language()
     language.id = -1
-    language.identifier = u'test'
-    language.iso639 = language.iso3166 = u'--'
+    language.identifier = 'test'
+    language.iso639 = language.iso3166 = '--'
     language.official = False
     connection.add(language)
-    item.name_map[language] = u"foo"
+    item.name_map[language] = "foo"
     assert item.name_map[language] == "foo"
     assert language in item.name_map
-    item.name_map[language] = u"xyzzy"
+    item.name_map[language] = "xyzzy"
     assert item.name_map[language] == "xyzzy"
 
 def test_markdown():
     move = connection.query(tables.Move).filter_by(
-            identifier=u"thunderbolt").one()
+            identifier="thunderbolt").one()
     language = connection.query(tables.Language).filter_by(
-            identifier=u"en").one()
+            identifier="en").one()
     assert '10%' in move.effect.as_text()
     assert '10%' in move.effect_map[language].as_text()
     assert '10%' in move.effect.as_html()
     assert '10%' in move.effect_map[language].as_html()
-    assert '10%' in unicode(move.effect)
-    assert '10%' in unicode(move.effect_map[language])
+    assert '10%' in str(move.effect)
+    assert '10%' in str(move.effect_map[language])
     assert '10%' in move.effect.__html__()
     assert '10%' in move.effect_map[language].__html__()
 
 def test_markdown_string():
     en = util.get(connection, tables.Language, 'en')
     md = markdown.MarkdownString('[]{move:thunderbolt} [paralyzes]{mechanic:paralysis} []{form:sky shaymin}. []{pokemon:mewthree} does not exist.', connection, en)
-    assert unicode(md) == 'Thunderbolt paralyzes Sky Shaymin. mewthree does not exist.'
+    assert str(md) == 'Thunderbolt paralyzes Sky Shaymin. mewthree does not exist.'
     assert md.as_html() == '<p><span>Thunderbolt</span> <span>paralyzes</span> <span>Sky Shaymin</span>. <span>mewthree</span> does not exist.</p>'
 
     class ObjectTestExtension(markdown.PokedexLinkExtension):
@@ -153,17 +153,17 @@ def test_markdown_values(parent_class, translation_class, column_name):
     test_extension = TestExtension(connection)
 
     for item in query:
-        for language, md_text in getattr(item, column_name + '_map').items():
+        for language, md_text in list(getattr(item, column_name + '_map').items()):
 
             if md_text is None:
                 continue
 
-            key = u"Markdown in {0} #{1}'s {2} (lang={3})".format(
+            key = "Markdown in {0} #{1}'s {2} (lang={3})".format(
                     parent_class.__name__, item.id, column_name, language.identifier)
 
             text = md_text.as_html(extension=test_extension)
 
-            error_message = u"{0} leaves syntax cruft:\n{1}"
+            error_message = "{0} leaves syntax cruft:\n{1}"
             error_message = error_message.format(key, text)
 
             assert not any(char in text for char in '[]{}'), error_message

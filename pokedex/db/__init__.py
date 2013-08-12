@@ -34,7 +34,7 @@ def connect(uri=None, session_args={}, engine_args={}, engine_prefix=''):
 
         # Tables should be InnoDB, in the event that we're creating them, and
         # use UTF-8 goddammit!
-        for table in metadata.tables.values():
+        for table in list(metadata.tables.values()):
             table.kwargs['mysql_engine'] = 'InnoDB'
             table.kwargs['mysql_charset'] = 'utf8'
 
@@ -65,19 +65,19 @@ def identifier_from_name(name):
     else:
         identifier = name
     identifier = identifier.lower()
-    identifier = identifier.replace(u'+', u' plus ')
-    identifier = re.sub(u'[ _–]+', u'-', identifier)
-    identifier = re.sub(u"['./;’(),:]", u'', identifier)
-    identifier = identifier.replace(u'é', u'e')
-    identifier = identifier.replace(u'♀', u'-f')
-    identifier = identifier.replace(u'♂', u'-m')
-    if identifier in (u'???', u'????'):
-        identifier = u'unknown'
-    elif identifier == u'!':
-        identifier = u'exclamation'
-    elif identifier == u'?':
-        identifier = u'question'
+    identifier = identifier.replace('+', ' plus ')
+    identifier = re.sub('[ _–]+', '-', identifier)
+    identifier = re.sub("['./;’(),:]", '', identifier)
+    identifier = identifier.replace('é', 'e')
+    identifier = identifier.replace('♀', '-f')
+    identifier = identifier.replace('♂', '-m')
+    if identifier in ('???', '????'):
+        identifier = 'unknown'
+    elif identifier == '!':
+        identifier = 'exclamation'
+    elif identifier == '?':
+        identifier = 'question'
 
-    if not identifier.replace(u"-", u"").isalnum():
+    if not identifier.replace("-", "").isalnum():
         raise ValueError(identifier)
     return identifier

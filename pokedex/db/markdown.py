@@ -1,5 +1,5 @@
 # encoding: utf8
-u"""Implements the markup used for description and effect text in the database.
+"""Implements the markup used for description and effect text in the database.
 
 The language used is a variation of Markdown and Markdown Extra.  There are
 docs for each at http://daringfireball.net/projects/markdown/ and
@@ -9,7 +9,7 @@ Pokédex links are represented with the syntax `[label]{category:identifier}`,
 e.g., `[Eevee]{pokemon:eevee}`. The label can (and should) be left out, in
 which case it is replaced by the name of the thing linked to.
 """
-from __future__ import absolute_import
+
 
 import re
 
@@ -97,18 +97,18 @@ def _markdownify_effect_text(move, effect_text, language=None):
     if effect_text is None:
         return effect_text
     effect_text = effect_text.replace(
-        u'$effect_chance',
-        unicode(move.effect_chance),
+        '$effect_chance',
+        str(move.effect_chance),
     )
 
     # "The target" vs "each target"; for Conquest, but hopefully main series
     # moves too eventually
     if hasattr(move, 'range'):
         effect_text = effect_text.replace(
-            u'$target',
+            '$target',
             _target_labels[move.range.targets > 1]
         ).replace(
-            u'$Target',
+            '$Target',
             _target_labels[move.range.targets > 1].capitalize()
         )
 
@@ -165,7 +165,7 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
 
     Handles matches using factory
     """
-    regex = ur'(?x) \[ ([^]]*) \] \{ ([-a-z0-9]+) : ([-a-z0-9 ]+) \}'
+    regex = r'(?x) \[ ([^]]*) \] \{ ([-a-z0-9]+) : ([-a-z0-9 ]+) \}'
 
     def __init__(self, factory, session, string_language=None, game_language=None):
         markdown.inlinepatterns.Pattern.__init__(self, self.regex)
@@ -230,7 +230,7 @@ class PokedexLinkPattern(markdown.inlinepatterns.Pattern):
         return el
 
 class PokedexLinkExtension(markdown.Extension):
-    u"""Markdown extension that translates the syntax used in effect text:
+    """Markdown extension that translates the syntax used in effect text:
 
     `[label]{category:identifier}` is treated as a link to a Pokédex object,
     where `category` is the table's singular name, and `label` is an optional
@@ -266,7 +266,7 @@ class PokedexLinkExtension(markdown.Extension):
         return None
 
     def object_url(self, category, obj):
-        u"""Return the URL for the ORM object `obj`.
+        """Return the URL for the ORM object `obj`.
 
         Returns None by default, which causes identifier_url to be tried.
 
